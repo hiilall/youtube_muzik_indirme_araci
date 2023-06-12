@@ -34,13 +34,13 @@ class AnaPencere(QtWidgets.QMainWindow, Ui_MainWindow):
         video=YT(url, use_oauth=True, allow_oauth_cache=True)
         self.ui.labelSarkiAdi.setText(video.title)
 
-        urllib.request.urlretrieve(video.thumbnail_url, 'resim1.jpg')
-        img = cv2.imread("resim1.jpg")
+        urllib.request.urlretrieve(video.thumbnail_url, 'img.jpg')
+        img = cv2.imread("img.jpg")
         img = cv2.resize(img, (320,240))
-        cv2.imwrite("resim1.jpg", img)
-        self.pixmap = QPixmap("resim1.jpg")
+        cv2.imwrite("img.jpg", img)
+        self.pixmap = QPixmap("img.jpg")
         self.ui.label_image.setPixmap(self.pixmap)   
-        os.remove("resim1.jpg")
+        os.remove("img.jpg")
      
     def muzik_indir(self):
 
@@ -53,32 +53,27 @@ class AnaPencere(QtWidgets.QMainWindow, Ui_MainWindow):
                 os.mkdir("music")"""
 
         url = self.ui.textEdit_2.toPlainText()
+        adress = os.getcwd()
+        if self.ui.radioButtonMp4.isChecked():
+            video=YT(url, use_oauth=True, allow_oauth_cache=True)
+            stream=video.streams.filter(file_extension='mp4').first()
+            stream.download(adress +"/video")
+            name = video.title
+            with os.scandir(adress+"/video") as tarama:
+                for music in tarama:
+                    if music.name.startswith(name):
+                        self.ui.labelOutput.setText("success")
 
-        video=YT(url, use_oauth=True, allow_oauth_cache=True)
-        strm=video.streams.filter(only_audio=True).first()
-        strm.download("C:/Users/hilae/Desktop/music")
-        
-        """
-        sarki_url = "https://www.youtube.com/watch?v=Ah0Ys50CqO8&feature=youtu.be"
-        yt = YouTube(sarki_url)
-                
-        video = yt.streams.filter(only_audio=True).first()
+        else:
+            video=YT(url, use_oauth=True, allow_oauth_cache=True)
+            strm=video.streams.filter(only_audio=True).first()
+            strm.download(adress +"/music")
+            name = video.title
+            with os.scandir(adress+"/music") as tarama:
+                for music in tarama:
+                    if music.name.startswith(name):
+                        self.ui.labelOutput.setText("success")
 
-        out_file = video.download()
-        base, ext = os.path.splitext(out_file)
-        new_file = base + '.mp3'
-        os.rename(out_file, new_file)
-        
-        # result of success
-        print(yt.title + " has been successfully downloaded.")
-        
-        adres = os.getcwd()
-        with os.scandir(adres) as tarama:
-            for belge in tarama:
-                if belge.name.endswith("mp4"):
-                    if belge.name.startswith(yt.title):
-                        print("isim",belge.name)
-                        #os.remove(belge.name)"""
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
